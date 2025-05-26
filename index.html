@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>DressUp - Login</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap');
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #a0c4ff 0%, #caf0f8 100%);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: #333;
+      padding: 1rem;
+    }
+
+    .login-container {
+      background: #ffffffdd;
+      backdrop-filter: blur(10px);
+      border-radius: 16px;
+      box-shadow: 0 16px 40px rgba(0,0,0,0.12);
+      padding: 2rem 3rem;
+      max-width: 800px;
+      width: 100%;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 3rem;
+      margin: auto;
+    }
+
+    .form-column {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .logo {
+      font-weight: 700;
+      font-size: 2.25rem;
+      color: #0077b6;
+      margin-bottom: 2rem;
+      user-select: none;
+    }
+
+    form {
+      width: 100%;
+      max-width: 350px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .form-group {
+      width: 100%;
+      margin-bottom: 1.25rem;
+    }
+
+    label {
+      display: block;
+      font-weight: 500;
+      margin-bottom: 0.4rem;
+    }
+
+    input[type="text"],
+    input[type="password"] {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border-radius: 8px;
+      border: 1.8px solid #ccc;
+      font-size: 1rem;
+      transition: border-color 0.3s ease;
+    }
+
+    input[type="text"]:focus,
+    input[type="password"]:focus {
+      outline: none;
+      border-color: #0077b6;
+      box-shadow: 0 0 8px rgba(0, 119, 182, 0.3);
+    }
+
+    button {
+      background-color: #0077b6;
+      color: white;
+      font-weight: 600;
+      font-size: 1.15rem;
+      padding: 0.75rem 1rem;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      width: 100%;
+      margin-top: 0.5rem;
+      transition: background-color 0.3s ease;
+      user-select: none;
+      display: block;
+      text-align: center;
+    }
+    .toggle-link {
+      margin-top: 1rem;
+      color: #0077b6;
+      cursor: pointer;
+      font-weight: 500;
+      text-align: center;
+      display: block;
+      background: none;
+      border: none;
+      font-size: 1rem;
+      text-decoration: underline;
+      transition: color 0.2s;
+    }
+    .toggle-link:hover {
+      color: #023e8a;
+    }
+
+    .qr-column {
+      flex-basis: 180px;
+      flex-shrink: 0;
+      text-align: center;
+      user-select: none;
+    }
+
+    .qr-column p {
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+      color: #023e8a;
+      font-size: 1.1rem;
+    }
+
+    .qr-code {
+      width: 185px;
+      height: 185px;
+      text-align: center;
+      border-radius: 14px;
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+      user-select: none;
+    }
+
+    @media (max-width: 900px) {
+      .login-container {
+        max-width: 95vw;
+        padding-left: 1.2rem;
+        padding-right: 1.2rem;
+      }
+    }
+
+    @media (max-width: 720px) {
+      body {
+        padding: 0;
+      }
+
+      .login-container {
+        flex-direction: column;
+        max-width: 360px;
+        width: 100%;
+        padding: 2rem 1rem;
+        gap: 2rem;
+      }
+
+      .qr-column {
+        order: -1;
+        margin-bottom: 1rem;
+        width: 100%;
+        text-align: center;
+      }
+
+      form {
+        width: 100%;
+      }
+
+      button {
+        width: 100%;
+      }
+    }
+
+    @media (max-width: 450px) {
+      .body{
+        height: 50%;
+      }
+      .login-container {
+        flex-direction: column;
+        max-width: 360px;
+        width: 100%;
+        gap: 2rem;
+        padding: 0;
+      }
+
+      .qr-code {
+        width: 100px;
+        height: 100px;
+      }
+
+      .logo {
+        font-size: 1.4rem;
+      }
+
+      button {
+        font-size: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="login-container" role="main">
+    <section class="form-column">
+      <div class="logo">DressUp</div>
+
+      <!-- Login Form -->
+      <form id="loginForm" aria-describedby="loginInstructions" novalidate>
+        <div id="loginInstructions" style="position:absolute;left:-9999px;">
+          Please enter your username and password to log in.
+        </div>
+        <div class="form-group">
+          <label for="username">Username or Email</label>
+          <input type="text" id="username" name="username" placeholder="yawqna@example.com" required autocomplete="username" />
+        </div>
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" name="password" placeholder="Your password" required autocomplete="current-password" />
+        </div>
+        <button type="submit">Log In</button>
+        <button type="button" class="toggle-link" id="showSignupBtn">Don't have an account? Sign Up</button>
+      </form>
+      <!-- Sign Up Form (hidden by default) -->
+      <form id="signupForm" aria-describedby="signupInstructions" style="display:none" novalidate>
+        <div id="signupInstructions" style="position:absolute;left:-9999px;">
+          Please fill in the details to create your account.
+        </div>
+        <div class="form-group">
+          <label for="signup-username">Username</label>
+          <input type="text" id="signup-username" name="signup-username" placeholder="Choose a username" required autocomplete="username" />
+        </div>
+        <div class="form-group">
+          <label for="signup-email">Email</label>
+          <input type="text" id="signup-email" name="signup-email" placeholder="yawqna@example.com" required autocomplete="email" />
+        </div>
+        <div class="form-group">
+          <label for="signup-password">Password</label>
+          <input type="password" id="signup-password" name="signup-password" placeholder="Create a password" required autocomplete="new-password" />
+          <small style="color: #555;">Must be 8+ characters, with uppercase, lowercase, and number.</small>
+        </div>
+        <button type="submit">Sign Up</button>
+        <button type="button" class="toggle-link" id="showLoginBtn">Already have an account? Log In</button>
+      </form>
+    </section>
+
+    <section class="qr-column">
+      <p>Scan to style!</p>
+      <img src="qr.png" alt="QR code for web app" class="qr-code" />
+    </section>
+  </main>
+
+  <!-- JavaScript Toggle & Form Handlers -->
+ <script>
+  // Toggle between login and signup forms
+  document.getElementById('showSignupBtn').addEventListener('click', function () {
+    document.getElementById('loginForm').style.display = 'none';
+    document.getElementById('signupForm').style.display = '';
+  });
+
+  document.getElementById('showLoginBtn').addEventListener('click', function () {
+    document.getElementById('loginForm').style.display = '';
+    document.getElementById('signupForm').style.display = 'none';
+  });
+
+  // Password validation function
+  function isPasswordValid(password) {
+    const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
+    return regex.test(password);
+  }
+
+  // Login handler
+  document.getElementById('loginForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    const username = this.username.value.trim();
+    const password = this.password.value.trim();
+
+    if (!username || !password) {
+      alert('Please enter both username/email and password.');
+      return;
+    }
+
+    if (!isPasswordValid(password)) {
+      alert('Password must be at least 8 characters long and include a number, an uppercase letter, and a lowercase letter.');
+      return;
+    }
+
+    window.location.href = 'try.html';
+  });
+
+  // Signup handler
+  document.getElementById('signupForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    const username = this['signup-username'].value.trim();
+    const email = this['signup-email'].value.trim();
+    const password = this['signup-password'].value.trim();
+
+    if (!username || !email || !password) {
+      alert('Please complete all fields.');
+      return;
+    }
+
+    if (!isPasswordValid(password)) {
+      alert('Password must be at least 8 characters long and include a number, an uppercase letter, and a lowercase letter.');
+      return;
+    }
+
+    alert('Account created! Logging you in...');
+    window.location.href = 'try.html';
+  });
+</script>
+</body>
+</html>
