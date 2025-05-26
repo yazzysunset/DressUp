@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Calendar - Whering Style Outfit App</title>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      margin: 0;
+      background: #fafafa;
+      color: #121212;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      padding: 1rem;
+    }
+    header {
+      font-weight: 700;
+      font-size: 1.5rem;
+      text-align: center;
+      margin-bottom: 1rem;
+      position: sticky;
+      top: 0;
+      background: white;
+      padding: 1rem 0;
+      border-bottom: 1px solid #e8e8e8;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      z-index: 1000;
+    }
+    a.back-link {
+      position: fixed;
+      top: 1rem;
+      left: 1rem;
+      text-decoration: none;
+      color: #6a46f1;
+      font-weight: 600;
+      box-shadow: 0 0 0 2px #6a46f1;
+      padding: 0.3rem 0.6rem;
+      border-radius: 6px;
+      transition: background-color 0.2s;
+      z-index: 1100;
+    }
+    a.back-link:hover {
+      background-color: #6a46f122;
+    }
+    #calendar {
+      max-width: 700px;
+      margin: 0 auto;
+    }
+    .calendar-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: 600;
+      font-size: 1.25rem;
+      margin-bottom: 0.5rem;
+    }
+    .calendar-header button {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 1.8rem;
+      color: #6a46f1;
+      user-select: none;
+    }
+    .weekdays {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      text-align: center;
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+      color: #555;
+      user-select: none;
+    }
+    .weekdays div {
+      padding: 0.2rem 0;
+    }
+    .days {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 4px;
+      text-align: center;
+    }
+    .day {
+      padding: 8px 0;
+      border-radius: 6px;
+      cursor: pointer;
+      user-select: none;
+      transition: background-color 0.2s;
+    }
+    .day:hover {
+      background-color: #e0d7fc;
+    }
+    .day.today {
+      border: 2px solid #6a46f1;
+      font-weight: 700;
+      color: #6a46f1;
+    }
+    .day.has-event {
+      background-color: #d0b9ff;
+      color: #401ea9;
+    }
+    .selected-date {
+      background: #6a46f1;
+      color: white;
+      font-weight: 700;
+    }
+  </style>
+</head>
+<body>
+  <a href="try.html" class="back-link" aria-label="Back to main app">&#8592; Back</a>
+  <header>Event Calendar</header>
+  <div id="calendar" role="application" aria-label="Calendar date picker"></div>
+
+  <script>
+    const calendarEl = document.getElementById('calendar');
+    const plannedEvents = JSON.parse(localStorage.getItem('plannedevents') || '{}');
+  
+    let currentDate = new Date();
+    let selectedDate = null;
+
+    function renderCalendar(date) {
+      calendarEl.innerHTML = '';
+      const year = date.getFullYear();
+      const month = date.getMonth();
+
+      // Header with navigation
+      const header = document.createElement('div');
+      header.className = 'calendar-header';
+
+      const prevBtn = document.createElement('button');
+      prevBtn.textContent = '‹';
+      prevBtn.title = 'Previous month';
+      prevBtn.onclick = () => {
+        currentDate = new Date(year, month - 1, 1);
+        renderCalendar(currentDate);
+      };
+
+      const nextBtn = document.createElement('button');
+      nextBtn.textContent = '›';
+      nextBtn.title = 'Next month';
+      nextBtn.onclick = () => {
+        currentDate = new Date(year, month + 1, 1);
+        renderCalendar(currentDate);
+      };
+
+      const monthYear = document.createElement('div');
+      monthYear.textContent = date.toLocaleDateString(undefined, {month:'long', year:'numeric'});
+
+      header.appendChild(prevBtn);
+      header.appendChild(monthYear);
+      header.appendChild(nextBtn);
+
+      calendarEl.appendChild(header);
+
+      // Weekday labels
+      const weekdaysDiv = document.createElement('div');
+      weekdaysDiv.className = 'weekdays';
+      ['Su','Mo','Tu','We','Th','Fr','Sa'].forEach(d => {
+        const wd = document.createElement('div');
+        wd.textContent = d;
+        weekdaysDiv.appendChild(wd);
+      });
+      calendarEl.appendChild(weekdaysDiv);
+
+      // Days grid
+      const daysDiv = document.createElement('div');
+      daysDiv.className = 'days';
+
+      const firstDay = new Date(year, month, 1);
+      const lastDate = new Date(year, month + 1, 0).getDate();
+      const startWeekday = firstDay.getDay();
+
+      // Empty slots
+      for (let i = 0; i < startWeekday; i++) {
+        daysDiv.appendChild(document.createElement('div'));
+      }
+
+      const todayString = new Date().toISOString().slice(0,10);
+
+      for (let day = 1; day <= lastDate; day++) {
+        const dayDiv = document.createElement('div');
+        dayDiv.className = 'day';
+        const dateISO = `${year}-${String(month + 1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+        dayDiv.textContent = day;
+        dayDiv.setAttribute('tabindex', '0');
+        dayDiv.setAttribute('role', 'button');
+        dayDiv.setAttribute('aria-label', `Select date ${dateISO}`);
+
+        if (dateISO === todayString) {
+          dayDiv.classList.add('today');
+        }
+        if (plannedEvents[dateISO]) {
+          dayDiv.classList.add('has-event');
+          dayDiv.title = `Event: ${plannedEvents[dateISO]}`;
+        }
+        if (selectedDate === dateISO) {
+          dayDiv.classList.add('selected-date');
+        }
+
+        dayDiv.onclick = () => {
+          selectedDate = dateISO;
+          // Set event type selector in main app if present
+          try {
+            const eventSelect = window.opener ? window.opener.document.getElementById('event-select') : document.getElementById('event-select');
+            if (eventSelect && plannedEvents[dateISO]) {
+              eventSelect.value = plannedEvents[dateISO];
+              eventSelect.dispatchEvent(new Event('change'));
+            }
+          } catch(e) {
+            // fail silently if no opener or access denied
+          }
+          renderCalendar(currentDate);
+        };
+
+        dayDiv.onkeydown = (e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            dayDiv.click();
+          }
+        };
+
+        daysDiv.appendChild(dayDiv);
+      }
+
+      calendarEl.appendChild(daysDiv);
+    }
+
+    renderCalendar(currentDate);
+  </script>
+</body>
+</html>

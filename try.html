@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>DressUp</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
+    @media (max-width: 400px) {
+  .logo {
+    height: 32px;
+  }
+}    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      background: #fafafa;
+      color: #121212;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+    header {
+    background: white;
+    padding: 1rem 0 0.5rem 0;
+    border-bottom: 1px solid #e8e8e8;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    position: relative;
+    }
+    .header-container {
+    max-width: 700px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    }
+    .logo {
+    height: 40px;
+    object-fit: contain;
+    }
+
+    /* Weather styles */
+    main .weather-box {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+      padding: 0 1rem;
+    }
+    #weather-icon {
+      font-size: 2rem;
+      flex-shrink: 0;
+    }
+    #weather-temp {
+      font-weight: 600;
+      font-size: 1.3rem;
+    }
+    #weather-desc {
+      font-size: 1rem;
+      text-transform: capitalize;
+      color: #6a46f1;
+      font-weight: 400;
+    }
+    #forecast {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 10px;
+      padding: 0 0.75rem 1rem 0.75rem;
+      /* Removed overflow and scrollbar settings */
+      max-width: 700px;
+      margin: 0 auto;
+    }
+    #forecast div {
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      padding: 6px;
+      min-width: 0;
+      position: relative;
+      text-align: center;
+      user-select: none;
+    }
+    #forecast div > div:first-child {
+      position: absolute;
+      top: 4px;
+      left: 6px;
+      font-size: 0.7rem;
+      color: #555;
+      white-space: nowrap;
+    }
+    #forecast div > div:nth-child(2) {
+      font-size: 1.4rem;
+      margin-top: 20px;
+    }
+    #forecast div > div:nth-child(3) {
+      font-weight: 500;
+      font-size: 0.9rem;
+    }
+    #forecast div > div:nth-child(4) {
+      font-size: 0.8rem;
+    }
+
+    main {
+      flex: 1;
+      padding: 0 1rem 6.5rem 1rem;
+      max-width: 700px;
+      margin: 0 auto;
+      width: 100%;
+    }
+    h2 {
+      margin-bottom: 1rem;
+      font-weight: 600;
+      font-size: 1.25rem;
+      color: #1b1b1b;
+    }
+    section {
+      display: none;
+    }
+    section.active {
+      display: block;
+    }
+
+    /* Save item button */
+    #save-item-btn {
+      background: #6a46f1;
+      color: white;
+      font-weight: 600;
+      border: none;
+      border-radius: 28px;
+      padding: 0.6rem 1.5rem;
+      box-shadow: 0 4px 12px rgb(106 70 241 / 0.5);
+      cursor: pointer;
+      transition: background-color 0.3s, box-shadow 0.3s;
+      user-select: none;
+    }
+    #save-item-btn:hover:not(:disabled) {
+      background: #7f59f4;
+      box-shadow: 0 6px 16px rgb(127 89 244 / 0.6);
+    }
+    #save-item-btn:disabled {
+      background: #a998f7;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+        /* Upload outfit items */
+    #upload-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+    }
+    #upload-label {
+      cursor: pointer;
+      border: 2px dashed #bbb;
+      border-radius: 10px;
+      width: 160px;
+      height: 160px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 48px;
+      color: #bbb;
+      user-select: none;
+      transition: border-color 0.3s, color 0.3s;
+    }
+    #upload-label:hover {
+      border-color: #6a46f1;
+      color: #6a46f1;
+    }
+    #upload-input {
+      display: none;
+    }
+    #preview {
+      max-width: 160px;
+      max-height: 160px;
+      border-radius: 12px;
+      object-fit: cover;
+      box-shadow: 0 2px 8px rgb(106 70 241 / 0.35);
+      display: none;
+    }
+
+    /* Select type of clothing */
+    #item-type-select {
+      width: 160px;
+      font-size: 1rem;
+      padding: 0.5rem;
+      border: 1.5px solid #ddd;
+      border-radius: 6px;
+      outline-offset: 2px;
+      outline-color: transparent;
+      transition: outline-color 0.3s;
+    }
+    #item-type-select:focus {
+      outline-color: #6a46f1;
+    }
+
+    /* Closet (wardrobe) */
+    #closet-section {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+    #closet-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+      gap: 1rem;
+    }
+    .closet-item {
+      background: white;
+      border-radius: 14px;
+      box-shadow: 0 1.5px 8px rgb(0 0 0 / 0.07);
+      cursor: pointer;
+      transition: box-shadow 0.25s;
+      user-select: none;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      position: relative;
+    }
+    .closet-item:hover {
+      box-shadow: 0 5px 20px rgb(106 70 241 / 0.3);
+    }
+    .closet-item img {
+      width: 100%;
+      aspect-ratio: 3 / 4;
+      object-fit: cover;
+    }
+    .closet-type-tag {
+      position: absolute;
+      top: 6px;
+      left: 8px;
+      background: #6a46f1cc;
+      color: white;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 100px;
+      font-size: 0.75rem;
+      text-transform: capitalize;
+      user-select: none;
+      pointer-events: none;
+    }
+    .closet-delete-btn {
+      position: absolute;
+      top: 4px;
+      right: 6px;
+      background: #e03131cc;
+      border: none;
+      border-radius: 50%;
+      color: white;
+      width: 22px;
+      height: 22px;
+      font-weight: 700;
+      cursor: pointer;
+      opacity: 0.8;
+      transition: opacity 0.3s;
+      user-select: none;
+      line-height: 20px;
+    }
+    .closet-delete-btn:hover {
+      opacity: 1;
+    }
+
+    /* Nav bar fixed bottom */
+    nav {
+      position: fixed;
+      bottom: 0;
+      left: 0; right: 0;
+      height: 56px;
+      background: white;
+      border-top: 1px solid #e8e8e8;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      box-shadow: 0 -2px 8px rgba(0,0,0,0.05);
+      font-weight: 600;
+      user-select: none;
+      z-index: 100;
+    }
+    nav button {
+      background: none;
+      border: none;
+      flex-grow: 1;
+      text-align: center;
+      font-size: 0.875rem;
+      color: #9e9e9e;
+      cursor: pointer;
+      padding: 6px 0 2px 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      transition: color 0.3s;
+    }
+    nav button.active, nav button:hover {
+      color: #6a46f1;
+    }
+    nav button svg {
+      width: 22px;
+      height: 22px;
+      fill: currentColor;
+    }
+
+  </style>
+</head>
+<body>
+<header>
+  <div class="header-container">
+    <img src="/DressUp/icons/logo.png" alt="DressUp Logo" class="logo" />
+  </div>
+
+    <!-- Calendar Icon and Popup -->
+    <a href="calendar.html" aria-label="Open calendar page" title="Calendar" style="margin-left: 12px; display: inline-block; vertical-align: middle; cursor: pointer;">
+  <svg width="24" height="24" fill="#6a46f1" viewBox="0 0 24 24" aria-hidden="true">
+    <rect x="3" y="4" width="18" height="18" rx="2" ry="2" stroke="#6a46f1" stroke-width="2" fill="none"/>
+    <line x1="16" y1="2" x2="16" y2="6" stroke="#6a46f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <line x1="8" y1="2" x2="8" y2="6" stroke="#6a46f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <line x1="3" y1="10" x2="21" y2="10" stroke="#6a46f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>
+</a>
+</header>
+
+<main>
+  <!-- Weather Widget -->
+  <div class="weather-box" aria-live="polite" aria-atomic="true" role="region" aria-label="Current weather and 7 day forecast">
+    <div id="weather-icon">⏳</div>
+    <div>
+      <div id="weather-temp">--°C</div>
+      <div id="weather-desc">Loading weather...</div>
+    </div>
+  </div>
+  <h3 style="margin-left: 0.75rem; font-weight: 600; color:#6a46f1;">7-Day Forecast</h3>
+  <div id="forecast" aria-label="7 day weather forecast" role="list" tabindex="0"></div>
+
+  <!-- Your existing app sections (upload, closet, assemble, recommend) go here -->
+    <section id="upload-section" class="active" aria-label="Upload closet item" style="text-align: center; margin-top: 2rem;">
+
+  <h2>Add New Closet Item</h2>
+
+  <!-- Upload Box -->
+  <label for="upload-input" id="upload-label"
+         style="display: inline-block; width: 150px; height: 150px; border: 2px dashed #ccc;
+                border-radius: 10px; font-size: 48px; color: #aaa; cursor: pointer; line-height: 150px;"
+         tabindex="0" aria-describedby="uploadDesc">
+    ＋
+  </label>
+  <input type="file" id="upload-input" accept="image/*"
+         style="display: none;" aria-required="true" aria-label="Upload outfit item image" />
+
+  <!-- Preview -->
+  <div style="margin-top: 1rem;">
+    <img id="preview" alt="Preview of uploaded outfit item"
+         style="display: none; max-height: 120px; border-radius: 8px;" aria-live="polite" />
+  </div>
+
+  <!-- Item Type Select -->
+  <div style="margin-top: 1rem;">
+    <select id="item-type-select" aria-label="Select type of clothing" aria-required="true"
+            style="padding: 0.5rem; border-radius: 6px;">
+      <option value="" disabled selected>Select item type</option>
+      <option value="top">Top</option>
+      <option value="bottom">Bottom</option>
+      <option value="skirt">Skirt</option>
+      <option value="dress">Dress</option>
+      <option value="shoes">Shoes</option>
+      <option value="accessory">Accessory</option>
+      <option value="outerwear">Outerwear</option>
+    </select>
+    <button id="save-item-btn" disabled>Save to Closet</button>
+  </div>
+    <!-- Closet Section -->
+  <section id="closet-section" aria-label="Closet items">
+    <h2>My Closet</h2>
+    <div id="closet-list" aria-live="polite" aria-relevant="additions removals"></div>
+    <p id="closet-empty-msg" style="color:#777; font-style: italic;"></p>
+  </section>
+  <!-- Outfit Assembly Section -->
+  <section id="outfit-assembly-section" aria-label="Assemble outfit from closet">
+    <h2>Assemble Outfit</h2>
+    <p id="assembly-instructions">Select items from your closet below to build an outfit you love.</p>
+    <div id="assembly-closet-grid" aria-live="polite" aria-relevant="additions"></div>
+    <div id="assembled-outfit-display" aria-label="Assembled outfit preview" role="list"></div>
+    <button id="save-outfit-assembled-btn" disabled>Save Assembled Outfit</button>
+  </section>
+  <!-- Recommendations Section -->
+  <section id="recommendation-section" aria-label="Outfit recommendations">
+    <h2>Outfit Recommendations</h2>
+    <div class="filter-row" style="gap:10px; flex-wrap:wrap;">
+      <select id="mood-select" aria-label="Select mood" title="Select mood">
+        <option value="" disabled selected>Choose Mood</option>
+        <option value="casual">Casual</option>
+        <option value="formal">Formal</option>
+        <option value="sporty">Sporty</option>
+        <option value="chic">Chic</option>
+        <option value="party">Party</option>
+        <option value="comfortable">Comfortable</option>
+      </select>
+      <select id="skin-type-select" aria-label="Select skin type" title="Select skin type">
+        <option value="" disabled selected>Choose Skin Type</option>
+        <option value="fair">Fair</option>
+        <option value="medium">Medium</option>
+        <option value="olive">Olive</option>
+        <option value="dark">Dark</option>
+      </select>
+      <select id="event-select" aria-label="Select event" title="Select event">
+        <option value="" disabled selected>Choose Event</option>
+        <option value="office">Office</option>
+        <option value="wedding">Wedding</option>
+        <option value="party">Party</option>
+        <option value="casual">Casual</option>
+        <option value="sport">Sport</option>
+      </select>
+      <button id="recommend-btn" style="flex-shrink: 0;">Get Recommendations</button>
+    </div>
+    <div id="recommendations-list" aria-live="polite" aria-relevant="additions"></div>
+  </section>
+</main>
+</section>
+</main>
+
+<nav aria-label="App navigation tabs">
+  <button id="tab-upload" class="active" aria-selected="true" aria-controls="upload-section" role="tab" tabindex="0" title="Add Closet Item">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14m7-7H5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    Upload
+  </button>
+  <button id="tab-closet" aria-selected="false" aria-controls="closet-section" role="tab" tabindex="-1" title="My Closet">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 21h14a2 2 0 002-2V7H3v12a2 2 0 002 2zM7 7V5a5 5 0 0110 0v2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    Closet
+  </button>
+  <button id="tab-assemble" aria-selected="false" aria-controls="outfit-assembly-section" role="tab" tabindex="-1" title="Assemble Outfit">
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M4 12h16M12 4v16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    Assemble
+  </button>
+  <button id="tab-recommend" aria-selected="false" aria-controls="recommendation-section" role="tab" tabindex="-1" title="Recommendations">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="12" r="2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="15" cy="6" r="2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="15" cy="18" r="2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    Recommend
+  </button>
+</nav>
+
+<script>
+  const uploadInput = document.getElementById('upload-input');
+  const preview = document.getElementById('preview');
+  const saveButton = document.getElementById('save-item-btn');
+  const itemTypeSelect = document.getElementById('item-type-select');
+
+  uploadInput.addEventListener('change', () => {
+    const file = uploadInput.files[0];
+    if (file) {
+      preview.src = URL.createObjectURL(file);
+      preview.style.display = 'block';
+    }
+    checkEnableSave();
+  });
+
+  itemTypeSelect.addEventListener('change', checkEnableSave);
+
+  function checkEnableSave() {
+    if (uploadInput.files.length > 0 && itemTypeSelect.value) {
+      saveButton.disabled = false;
+    } else {
+      saveButton.disabled = true;
+    }
+  }
+</script>
+
+<script>
+const tabs = document.querySelectorAll('nav button');
+const sections = document.querySelectorAll('section');
+
+tabs.forEach(tab => {
+  tab.addEventListener('click', () => {
+    tabs.forEach(t => t.classList.remove('active'));
+    sections.forEach(s => s.style.display = 'none');
+    tab.classList.add('active');
+    document.getElementById(tab.getAttribute('aria-controls')).style.display = 'block';
+  });
+});
+
+    //weather
+  const weatherCodeToEmoji = {
+    0: '☀️', 1: '🌤️', 2: '⛅', 3: '☁️',
+    45: '🌫️', 48: '🌫️',
+    51: '🌦️', 53: '🌧️', 55: '🌧️',
+    56: '🌧️', 57: '🌧️',
+    61: '🌦️', 63: '🌧️', 65: '🌧️',
+    66: '🌨️', 67: '🌨️',
+    71: '🌨️', 73: '🌨️', 75: '🌨️',
+    77: '❄️',
+    80: '🌦️', 81: '🌧️', 82: '🌧️',
+    85: '🌨️', 86: '🌨️',
+    95: '⛈️', 96: '⛈️', 99: '⛈️'
+  };
+
+  const weatherDescriptions = {
+    0: 'Clear sky', 1: 'Mainly clear', 2: 'Partly cloudy', 3: 'Mostly Cloudy',
+    45: 'Fog', 48: 'Depositing rime fog',
+    51: 'Light drizzle', 53: 'Moderate drizzle', 55: 'Dense drizzle',
+    56: 'Freezing drizzle (light)', 57: 'Freezing drizzle (dense)',
+    61: 'Slight rain', 63: 'Moderate rain', 65: 'Heavy rain',
+    66: 'Light freezing rain', 67: 'Heavy freezing rain',
+    71: 'Slight snow', 73: 'Moderate snow', 75: 'Heavy snow', 77: 'Snow grains',
+    80: 'Slight rain showers', 81: 'Moderate rain showers', 82: 'Violent rain showers',
+    85: 'Slight snow showers', 86: 'Heavy snow showers',
+    95: 'Thunderstorm', 96: 'Thunderstorm w/ slight hail', 99: 'Thunderstorm w/ heavy hail'
+  };
+
+  function formatDateShort(dateStr) {
+    const date = new Date(dateStr);
+    return date.toLocaleDateString(undefined, { weekday: 'short' });
+  }
+
+  function fetchWeather(lat, lon) {
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&temperature_unit=celsius&daily=weathercode,temperature_2m_max,temperature_2m_min&timezone=auto`;
+    return fetch(url)
+      .then(res => res.json())
+      .then(data => ({
+        temperature: Math.round(data.current_weather.temperature),
+        weathercode: data.current_weather.weathercode,
+        forecast: data.daily
+      }));
+  }
+
+  function updateWeatherDisplay(weather) {
+    const weatherIcon = document.getElementById('weather-icon');
+    const weatherTemp = document.getElementById('weather-temp');
+    const weatherDesc = document.getElementById('weather-desc');
+    const forecastEl = document.getElementById('forecast');
+
+    weatherIcon.textContent = weatherCodeToEmoji[weather.weathercode] || '🌈';
+    weatherTemp.textContent = `${weather.temperature}°C`;
+    weatherDesc.textContent = weatherDescriptions[weather.weathercode] || 'Unknown weather';
+
+    const days = weather.forecast.time;
+    const codes = weather.forecast.weathercode;
+    const highs = weather.forecast.temperature_2m_max;
+    const lows = weather.forecast.temperature_2m_min;
+
+    forecastEl.innerHTML = '';
+    for (let i = 0; i < days.length; i++) {
+      const icon = weatherCodeToEmoji[codes[i]] || '🌈';
+      const fullDate = new Date(days[i]).toLocaleDateString();
+      const shortDay = formatDateShort(days[i]);
+
+      const box = document.createElement('div');
+      box.style.cssText = `
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        padding: 6px;
+        position: relative;
+        text-align: center;
+        user-select: none;
+      `;
+      box.innerHTML = `
+        <div style="position: absolute; top: 4px; left: 6px; font-size: 0.7rem; color: #555; white-space: nowrap;">${fullDate}</div>
+        <div style="font-size: 1.4rem; margin-top: 20px;">${icon}</div>
+        <div style="font-weight: 500; font-size: 0.9rem;">${shortDay}</div>
+        <div style="font-size: 0.8rem;">${lows[i]}° / ${highs[i]}°</div>
+      `;
+      forecastEl.appendChild(box);
+    }
+  }
+
+  function initWeather() {
+    const fallback = { lat: 14.83, lon: 120.28 }; // Olongapo fallback
+    if (!navigator.geolocation) {
+      fetchWeather(fallback.lat, fallback.lon).then(updateWeatherDisplay);
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(
+      pos => fetchWeather(pos.coords.latitude, pos.coords.longitude).then(updateWeatherDisplay),
+      () => fetchWeather(fallback.lat, fallback.lon).then(updateWeatherDisplay),
+      { timeout: 8000 }
+    );
+  }
+
+  window.addEventListener('load', () => {
+    initWeather();
+    // Initialize other app logic here (tabs, upload, closet, assemble, recommend...)
+  });
+
+  // Calendar ----
+  (() => {
+  const toggleBtn = document.getElementById('calendar-toggle');
+  const popup = document.getElementById('calendar-popup');
+
+  // Load planned events from localStorage (optional)
+  const plannedEvents = JSON.parse(localStorage.getItem('plannedevents') || '{}');
+
+  function renderCalendar(currentDate) {
+    popup.innerHTML = '';
+    const year = currentDate.getFullYear();
+    const month = currentDate.getMonth();
+
+    const header = document.createElement('div');
+    header.style.display = 'flex';
+    header.style.justifyContent = 'space-between';
+    header.style.alignItems = 'center';
+    header.style.marginBottom = '6px';
+
+    const prevBtn = document.createElement('button');
+    prevBtn.textContent = '‹';
+    prevBtn.title = 'Previous month';
+    prevBtn.style.cursor = 'pointer';
+    prevBtn.style.border = 'none';
+    prevBtn.style.background = 'none';
+    prevBtn.style.color = '#6a46f1';
+    prevBtn.style.fontSize = '1.5rem';
+    prevBtn.onclick = () => renderCalendar(new Date(year, month -1, 1));
+
+    const nextBtn = document.createElement('button');
+    nextBtn.textContent = '›';
+    nextBtn.title = 'Next month';
+    nextBtn.style.cursor = 'pointer';
+    nextBtn.style.border = 'none';
+    nextBtn.style.background = 'none';
+    nextBtn.style.color = '#6a46f1';
+    nextBtn.style.fontSize = '1.5rem';
+    nextBtn.onclick = () => renderCalendar(new Date(year, month +1, 1));
+
+    const title = document.createElement('div');
+    title.textContent = currentDate.toLocaleDateString(undefined, {month: 'long', year: 'numeric'});
+    title.style.fontWeight = '600';
+    title.style.fontSize = '1rem';
+
+    header.appendChild(prevBtn);
+    header.appendChild(title);
+    header.appendChild(nextBtn);
+    popup.appendChild(header);
+
+    // Days of week header
+    const daysHeader = document.createElement('div');
+    daysHeader.style.display = "grid";
+    daysHeader.style.gridTemplateColumns = "repeat(7,1fr)";
+    daysHeader.style.textAlign = "center";
+    daysHeader.style.fontWeight = "600";
+    daysHeader.style.marginBottom = "4px";
+    ['Su','Mo','Tu','We','Th','Fr','Sa'].forEach(d=> {
+      const day = document.createElement('div');
+      day.textContent = d;
+      daysHeader.appendChild(day);
+    });
+    popup.appendChild(daysHeader);
+
+    // Days grid
+    const daysGrid = document.createElement('div');
+    daysGrid.style.display = "grid";
+    daysGrid.style.gridTemplateColumns = "repeat(7,1fr)";
+    daysGrid.style.gap = "4px";
+    daysGrid.style.textAlign = "center";
+
+    const firstDay = new Date(year, month,1);
+    const startWeekday = firstDay.getDay();
+    const lastDate = new Date(year, month+1, 0).getDate();
+
+    // Empty slots before first date
+    for(let i=0; i<startWeekday; i++){
+      daysGrid.appendChild(document.createElement('div'));
+    }
+
+    const today = new Date();
+    const todayString = today.toISOString().slice(0,10);
+
+    for(let day=1; day<=lastDate; day++) {
+      const button = document.createElement('button');
+      button.textContent = day;
+      button.style.cursor = 'pointer';
+      button.style.borderRadius = '6px';
+      button.style.userSelect = 'none';
+      button.style.border = 'none';
+      button.style.padding = '6px 0';
+
+      const dateISO = `${year}-${String(month+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+
+      if(dateISO === todayString){
+        button.style.border = '2px solid #6a46f1';
+        button.style.color = '#6a46f1';
+        button.style.fontWeight = '700';
+      }
+
+      if(plannedEvents[dateISO]){
+        button.style.backgroundColor = '#d0b9ff';
+        button.style.color = '#401ea9';
+      }
+
+      button.title = `Select ${dateISO}`;
+      button.onclick = () => {
+        popup.style.display = 'none';
+        // Auto select event type dropdown if it exists and event planned:
+        const eventSelect = document.getElementById('event-select') || document.querySelector('select[aria-label="Select event"]');
+        if(eventSelect && plannedEvents[dateISO]){
+          eventSelect.value = plannedEvents[dateISO];
+          eventSelect.dispatchEvent(new Event('change'));
+        }
+        // Optionally do something with selected date...
+      };
+
+      daysGrid.appendChild(button);
+    }
+
+    popup.appendChild(daysGrid);
+    popup.style.display = 'block';
+    popup.focus();
+  }
+
+  toggleBtn.addEventListener('click', () => {
+    if(popup.style.display === 'block') {
+      popup.style.display = 'none';
+    } else {
+      renderCalendar(new Date());
+    }
+  });
+
+  document.addEventListener('click', e => {
+    if(!popup.contains(e.target) && e.target !== toggleBtn){
+      popup.style.display = 'none';
+    }
+  });
+
+  popup.addEventListener('keydown', e => {
+    if(e.key === 'Escape'){
+      popup.style.display = 'none';
+      toggleBtn.focus();
+    }
+  });
+
+})();
+
+</script>
+</body>
+</html>
