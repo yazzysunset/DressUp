@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>DressUp - Closet, Upload & Recommend</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet"/>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      background: #fafafa;
+      color: #121212;
+      min-height: 100vh;
+      padding-bottom: 64px;
+    }
+    header {
+      background: white;
+      padding: 1rem 0 0.5rem 0;
+      border-bottom: 1px solid #e8e8e8;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .header-container {
+      max-width: 700px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .logo {
+      height: 40px;
+      object-fit: contain;
+    }
+    nav {
+      position: fixed;
+      bottom: 0;
+      left: 0; right: 0;
+      height: 56px;
+      background: white;
+      border-top: 1px solid #e8e8e8;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      box-shadow: 0 -2px 8px rgba(0,0,0,0.05);
+      font-weight: 600;
+      user-select: none;
+      z-index: 100;
+    }
+    nav button {
+      background: none;
+      border: none;
+      flex-grow: 1;
+      text-align: center;
+      font-size: 0.95rem;
+      color: #9e9e9e;
+      cursor: pointer;
+      padding: 6px 0 2px 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      transition: color 0.3s;
+    }
+    nav button.active, nav button:hover {
+      color: #6a46f1;
+    }
+    main {
+      max-width: 700px;
+      margin: 0 auto;
+      padding: 1rem;
+    }
+    .page-section {
+      min-height: 80vh;
+      display: none;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: center;
+      padding-top: 2rem;
+      padding-bottom: 3rem;
+      width: 100%;
+    }
+    .page-section.active {
+      display: flex;
+      animation: fadeIn 0.4s;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    /* Weather styles */
+    .forecast-container {
+      margin-bottom: 1.8rem;
+      width: 100%;
+    }
+    .weather-box {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 5px;
+      padding: 5px;
+    }
+    #weather-icon {
+      font-size: 2rem;
+      flex-shrink: 0;
+    }
+    #weather-temp {
+      font-weight: 600;
+      font-size: 1.3rem;
+    }
+    #weather-desc {
+      font-size: 1rem;
+      text-transform: capitalize;
+      color: #6a46f1;
+      font-weight: 400;
+    }
+    #forecast {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 10px;
+      padding: 0 0.75rem 1rem 0.75rem;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+    #forecast div {
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      padding: 6px;
+      min-width: 0;
+      position: relative;
+      text-align: center;
+      user-select: none;
+    }
+    #forecast div > div:first-child {
+      position: absolute;
+      top: 4px;
+      left: 6px;
+      font-size: 0.7rem;
+      color: #555;
+      white-space: nowrap;
+    }
+    #forecast div > div:nth-child(2) {
+      font-size: 1.4rem;
+      margin-top: 20px;
+    }
+    #forecast div > div:nth-child(3) {
+      font-weight: 500;
+      font-size: 0.9rem;
+    }
+    #forecast div > div:nth-child(4) {
+      font-size: 0.8rem;
+    }
+    /* Upload Section Styles */
+    #upload-section {
+      gap: 10px;
+      width: 100%;
+    }
+    #upload-label {
+      cursor: pointer;
+      border: 2px dashed #bbb;
+      border-radius: 10px;
+      width: 160px;
+      height: 160px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 48px;
+      color: #bbb;
+      user-select: none;
+      transition: border-color 0.3s, color 0.3s;
+    }
+    #upload-label:hover {
+      border-color: #6a46f1;
+      color: #6a46f1;
+    }
+    #upload-input {
+      display: none;
+    }
+    #preview {
+      max-width: 160px;
+      max-height: 160px;
+      border-radius: 12px;
+      object-fit: cover;
+      box-shadow: 0 2px 8px rgb(106 70 241 / 0.35);
+      display: none;
+    }
+    #item-type-select {
+      width: 160px;
+      font-size: 1rem;
+      padding: 0.5rem;
+      border: 1.5px solid #ddd;
+      border-radius: 6px;
+    }
+    #save-item-btn {
+      background: #7f59f4;
+      box-shadow: 0 6px 16px rgb(127 89 244 / 0.6);
+      color: white;
+      padding: 0.5rem 1rem;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    #save-item-btn:disabled {
+      background: #a998f7;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+    #status-msg {
+      margin-top: 10px;
+      font-size: 0.9rem;
+      color: #2c2c2c;
+    }
+    /* Closet Section Styles */
+    #closet-section {
+      gap: 0.75rem;
+      width: 100%;
+    }
+    #closet-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+      gap: 1rem;
+      width: 100%;
+    }
+    .closet-item {
+      background: white;
+      border-radius: 14px;
+      box-shadow: 0 1.5px 8px rgb(0 0 0 / 0.07);
+      cursor: pointer;
+      transition: box-shadow 0.25s;
+      user-select: none;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      position: relative;
+    }
+    .closet-item:hover {
+      box-shadow: 0 5px 20px rgb(106 70 241 / 0.3);
+    }
+    .closet-item img {
+      width: 100%;
+      aspect-ratio: 3 / 4;
+      object-fit: cover;
+    }
+    .closet-type-tag {
+      position: absolute;
+      top: 6px;
+      left: 8px;
+      background: #6a46f1cc;
+      color: white;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 100px;
+      font-size: 0.75rem;
+      text-transform: capitalize;
+      user-select: none;
+      pointer-events: none;
+    }
+    .closet-delete-btn {
+      position: absolute;
+      top: 4px;
+      right: 6px;
+      background: #e03131cc;
+      border: none;
+      border-radius: 50%;
+      color: white;
+      width: 22px;
+      height: 22px;
+      font-weight: 700;
+      cursor: pointer;
+      opacity: 0.8;
+      transition: opacity 0.3s;
+      user-select: none;
+      line-height: 20px;
+    }
+    .closet-delete-btn:hover {
+      opacity: 1;
+    }
+    #closet-empty-msg {
+      color: #777;
+      font-style: italic;
+      font-size: 0.95rem;
+    }
+    /* Recommendations */
+    #recommendation-section {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      width: 100%;
+    }
+    .filter-row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 0.75rem;
+      align-items: center;
+    }
+    select {
+      padding: 0.5rem 1rem;
+      font-size: 1rem;
+      border: 1.7px solid #ddd;
+      border-radius: 8px;
+      outline-offset: 2px;
+      cursor: pointer;
+      background: white;
+      font-family: inherit;
+      transition: border-color 0.3s;
+      min-width: 140px;
+    }
+    select:focus {
+      border-color: #6a46f1;
+      outline: none;
+    }
+    #recommend-btn {
+      background: #6a46f1;
+      color: white;
+      padding: 0.7rem 1.8rem;
+      border: none;
+      border-radius: 28px;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgb(106 70 241 / 0.45);
+      user-select: none;
+      transition: background-color 0.3s, box-shadow 0.3s;
+      min-width: 140px;
+      height: 42px;
+    }
+    #recommend-btn:hover {
+      background: #7f59f4;
+      box-shadow: 0 6px 20px rgb(127 89 244 / 0.65);
+    }
+    #recommendations-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill,minmax(140px,1fr));
+      gap: 1rem;
+    }
+    .rec-item {
+      background: white;
+      border-radius: 14px;
+      box-shadow: 0 2px 12px rgb(0 0 0 / 0.08);
+      cursor: default;
+      overflow: hidden;
+      position: relative;
+      user-select: none;
+      display: flex;
+      flex-direction: column;
+      transition: box-shadow 0.3s;
+    }
+    .rec-item:hover {
+      box-shadow: 0 5px 22px rgb(106 70 241 / 0.25);
+    }
+    .rec-info {
+      padding: 0.7rem 1rem;
+      font-weight: 600;
+      font-size: 1rem;
+      color: #6a46f1;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 6px;
+    }
+    .rec-save-btn {
+      border: none;
+      background: #6a46f1;
+      color: white;
+      font-weight: 600;
+      font-size: 0.875rem;
+      padding: 0.3rem 0.9rem;
+      border-radius: 20px;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgb(106 70 241 / 0.36);
+      user-select: none;
+      transition: background-color 0.3s;
+    }
+    .rec-save-btn:hover {
+      background: #7f59f4;
+    }
+    p.no-recommendations {
+      color: #777;
+      font-style: italic;
+      text-align: center;
+      margin-top: 0.8rem;
+    }
+    @media (max-width: 500px) {
+      #closet-list { grid-template-columns: repeat(2, 1fr); }
+      main { padding: 0.3rem; }
+      .logo { height: 32px; }
+    }
+  </style>
+</head>
+<body>
+<header>
+  <div class="header-container">
+    <img src="logo.png" class="logo" alt="DressUp logo" />
+  </div>
+</header>
+<main>
+  <!-- Upload Section (with weather) -->
+  <section id="upload-section" class="page-section" aria-label="Upload closet item">
+    <div class="forecast-container">
+      <div class="weather-box">
+        <div id="weather-icon">⏳</div>
+        <div>
+          <div id="weather-temp">--°C</div>
+          <div id="weather-desc">Loading weather...</div>
+        </div>
+      </div>
+      <h3 style="margin-left: 0.75rem; font-weight: 600; color:#6a46f1;">7-Day Forecast</h3>
+      <div id="forecast" aria-label="7 day weather forecast" role="list" tabindex="0"></div>
+    </div>
+    <h2>Add New Closet Item</h2>
+    <label id="upload-label" for="upload-input" tabindex="0">＋</label>
+    <input type="file" id="upload-input" accept="image/*" />
+    <img id="preview" alt="Preview of uploaded outfit item" />
+    <select id="item-type-select">
+      <option value="" disabled selected>Select item type</option>
+      <option value="top">Top</option>
+      <option value="bottom">Bottom</option>
+      <option value="skirt">Skirt</option>
+      <option value="dress">Dress</option>
+      <option value="shoes">Shoes</option>
+      <option value="accessory">Accessory</option>
+      <option value="outerwear">Outerwear</option>
+    </select>
+    <button id="save-item-btn" disabled>Save to Closet</button>
+    <div id="status-msg" role="status" aria-live="polite"></div>
+  </section>
+  <!-- Closet Section -->
+  <section id="closet-section" class="page-section" aria-label="Closet items">
+    <h2>My Closet</h2>
+    <div id="closet-list"></div>
+    <p id="closet-empty-msg"></p>
+  </section>
+  <!-- Recommend Section -->
+  <section id="recommendation-section" class="page-section active" aria-label="Outfit recommendations">
+    <h2>Outfit Recommendations</h2>
+    <div class="filter-row">
+      <select id="mood-select" aria-label="Select mood">
+        <option value="" disabled selected>Choose Mood</option>
+        <option value="casual">Casual</option>
+        <option value="formal">Formal</option>
+        <option value="sporty">Sporty</option>
+        <option value="chic">Chic</option>
+        <option value="party">Party</option>
+        <option value="comfortable">Comfortable</option>
+      </select>
+      <select id="taste-select" aria-label="Select taste">
+        <option value="" disabled selected>Choose Taste</option>
+        <option value="classic">Classic</option>
+        <option value="modern">Modern</option>
+        <option value="bohemian">Bohemian</option>
+        <option value="minimalist">Minimalist</option>
+        <option value="vintage">Vintage</option>
+        <option value="streetwear">Streetwear</option>
+      </select>
+      <button id="recommend-btn">Get Recommendations</button>
+    </div>
+    <div id="recommendations-list" aria-live="polite" aria-relevant="additions"></div>
+  </section>
+</main>
+<nav>
+  <button id="nav-upload">Upload</button>
+  <button id="nav-closet">Closet</button>
+  <button id="nav-recommend" class="active">Recommend</button>
+</nav>
+<script>
+  // Navigation logic
+  const navUpload = document.getElementById('nav-upload');
+  const navCloset = document.getElementById('nav-closet');
+  const navRecommend = document.getElementById('nav-recommend');
+  const uploadSection = document.getElementById('upload-section');
+  const closetSection = document.getElementById('closet-section');
+  const recommendSection = document.getElementById('recommendation-section');
+  function showSection(sectionToShow) {
+    [uploadSection, closetSection, recommendSection].forEach(section => {
+      section.classList.toggle('active', section === sectionToShow);
+    });
+    navUpload.classList.toggle('active', sectionToShow === uploadSection);
+    navCloset.classList.toggle('active', sectionToShow === closetSection);
+    navRecommend.classList.toggle('active', sectionToShow === recommendSection);
+    if (sectionToShow === closetSection) renderCloset();
+  }
+  navUpload.addEventListener('click', () => showSection(uploadSection));
+  navCloset.addEventListener('click', () => showSection(closetSection));
+  navRecommend.addEventListener('click', () => showSection(recommendSection));
+  // Weather
+  const weatherCodeToEmoji = {
+    0: '☀️', 1: '🌤️', 2: '⛅', 3: '☁️',
+    45: '🌫️', 48: '🌫️',
+    51: '🌦️', 53: '🌧️', 55: '🌧️',
+    56: '🌧️', 57: '🌧️',
+    61: '🌦️', 63: '🌧️', 65: '🌧️',
+    66: '🌨️', 67: '🌨️',
+    71: '🌨️', 73: '🌨️', 75: '🌨️',
+    77: '❄️',
+    80: '🌦️', 81: '🌧️', 82: '🌧️',
+    85: '🌨️', 86: '🌨️',
+    95: '⛈️', 96: '⛈️', 99: '⛈️'
+  };
+  const weatherDescriptions = {
+    0: 'Clear sky', 1: 'Mainly clear', 2: 'Partly cloudy', 3: 'Mostly Cloudy',
+    45: 'Fog', 48: 'Depositing rime fog',
+    51: 'Light drizzle', 53: 'Moderate drizzle', 55: 'Dense drizzle',
+    56: 'Freezing drizzle (light)', 57: 'Freezing drizzle (dense)',
+    61: 'Slight rain', 63: 'Moderate rain', 65: 'Heavy rain',
+    66: 'Light freezing rain', 67: 'Heavy freezing rain',
+    71: 'Slight snow', 73: 'Moderate snow', 75: 'Heavy snow', 77: 'Snow grains',
+    80: 'Slight rain showers', 81: 'Moderate rain showers', 82: 'Violent rain showers',
+    85: 'Slight snow showers', 86: 'Heavy snow showers',
+    95: 'Thunderstorm', 96: 'Thunderstorm w/ slight hail', 99: 'Thunderstorm w/ heavy hail'
+  };
+  function formatDateShort(dateStr) {
+    const date = new Date(dateStr);
+    return date.toLocaleDateString(undefined, { weekday: 'short' });
+  }
+  function fetchWeather(lat, lon) {
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&temperature_unit=celsius&daily=weathercode,temperature_2m_max,temperature_2m_min&timezone=auto`;
+    return fetch(url)
+      .then(res => res.json())
+      .then(data => ({
+        temperature: Math.round(data.current_weather.temperature),
+        weathercode: data.current_weather.weathercode,
+        forecast: data.daily
+      }));
+  }
+  function updateWeatherDisplay(weather) {
+    const weatherIcon = document.getElementById('weather-icon');
+    const weatherTemp = document.getElementById('weather-temp');
+    const weatherDesc = document.getElementById('weather-desc');
+    const forecastEl = document.getElementById('forecast');
+    weatherIcon.textContent = weatherCodeToEmoji[weather.weathercode] || '🌈';
+    weatherTemp.textContent = `${weather.temperature}°C`;
+    weatherDesc.textContent = weatherDescriptions[weather.weathercode] || 'Unknown weather';
+    const days = weather.forecast.time;
+    const codes = weather.forecast.weathercode;
+    const highs = weather.forecast.temperature_2m_max;
+    const lows = weather.forecast.temperature_2m_min;
+    forecastEl.innerHTML = '';
+    for (let i = 0; i < days.length; i++) {
+      const icon = weatherCodeToEmoji[codes[i]] || '🌈';
+      const fullDate = new Date(days[i]).toLocaleDateString();
+      const shortDay = formatDateShort(days[i]);
+      const box = document.createElement('div');
+      box.innerHTML = `
+        <div style="position: absolute; top: 4px; left: 6px; font-size: 0.7rem; color: #555; white-space: nowrap;">${fullDate}</div>
+        <div style="font-size: 1.4rem; margin-top: 20px;">${icon}</div>
+        <div style="font-weight: 500; font-size: 0.9rem;">${shortDay}</div>
+        <div style="font-size: 0.8rem;">${lows[i]}° / ${highs[i]}°</div>
+      `;
+      forecastEl.appendChild(box);
+    }
+  }
+  function initWeather() {
+    const fallback = { lat: 14.83, lon: 120.28 };
+    if (!navigator.geolocation) {
+      fetchWeather(fallback.lat, fallback.lon).then(updateWeatherDisplay);
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(
+      pos => fetchWeather(pos.coords.latitude, pos.coords.longitude).then(updateWeatherDisplay),
+      () => fetchWeather(fallback.lat, fallback.lon).then(updateWeatherDisplay),
+      { timeout: 8000 }
+    );
+  }
+  // Only fetch weather when upload section is rendered
+  window.addEventListener('DOMContentLoaded', () => {
+    showSection(recommendSection);
+    initWeather();
+  });
+  // Upload JS
+  const uploadInput = document.getElementById('upload-input');
+  const preview = document.getElementById('preview');
+  const itemTypeSelect = document.getElementById('item-type-select');
+  const saveItemBtn = document.getElementById('save-item-btn');
+  const statusMsg = document.getElementById('status-msg');
+  let currentUploadDataUrl = null;
+  function validateUploadForm() {
+    const canSave = !!currentUploadDataUrl && !!itemTypeSelect.value;
+    saveItemBtn.disabled = !canSave;
+  }
+  function resetUploadState() {
+    currentUploadDataUrl = null;
+    preview.src = '';
+    preview.style.display = 'none';
+    uploadInput.value = '';
+    saveItemBtn.disabled = true;
+    itemTypeSelect.value = '';
+    statusMsg.textContent = '';
+  }
+  uploadInput.addEventListener('change', e => {
+    const file = e.target.files[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      alert('Please upload a valid image file.');
+      resetUploadState();
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = function () {
+      currentUploadDataUrl = reader.result;
+      preview.src = currentUploadDataUrl;
+      preview.style.display = 'block';
+      validateUploadForm();
+    };
+    reader.onerror = function () {
+      alert('Failed to load image.');
+      resetUploadState();
+    };
+    reader.readAsDataURL(file);
+  });
+  itemTypeSelect.addEventListener('change', validateUploadForm);
+  saveItemBtn.addEventListener('click', () => {
+    if (!currentUploadDataUrl || !itemTypeSelect.value) return;
+    const closet = loadCloset();
+    const newItem = {
+      id: 'item_' + Date.now(),
+      image: currentUploadDataUrl,
+      type: itemTypeSelect.value
+    };
+    closet.push(newItem);
+    saveCloset(closet);
+    statusMsg.textContent = 'Item saved to your closet!';
+    resetUploadState();
+  });
+  // Closet JS
+  function loadCloset() {
+    try {
+      const data = localStorage.getItem('closet_items');
+      return data ? JSON.parse(data) : [];
+    } catch {
+      return [];
+    }
+  }
+  function saveCloset(items) {
+    localStorage.setItem('closet_items', JSON.stringify(items));
+  }
+  function renderCloset() {
+    const closetList = document.getElementById('closet-list');
+    const closetEmptyMsg = document.getElementById('closet-empty-msg');
+    const closet = loadCloset();
+    closetList.innerHTML = '';
+    if (closet.length === 0) {
+      closetEmptyMsg.textContent = 'Your closet is empty. Add items from the Upload tab.';
+      return;
+    }
+    closetEmptyMsg.textContent = '';
+    closet.forEach(item => {
+      const div = document.createElement('div');
+      div.className = 'closet-item';
+      div.setAttribute('tabindex', '0');
+      div.setAttribute('aria-label', `Closet item ${item.type}`);
+      div.innerHTML = `
+        <img src="${item.image}" alt="${item.type} item" loading="lazy" />
+        <span class="closet-type-tag">${item.type}</span>
+        <button class="closet-delete-btn" aria-label="Delete this closet item" title="Delete">×</button>
+      `;
+      const delBtn = div.querySelector('.closet-delete-btn');
+      delBtn.addEventListener('click', e => {
+        e.stopPropagation();
+        if (confirm('Delete this item from closet?')) {
+          const updatedCloset = loadCloset().filter(i => i.id !== item.id);
+          saveCloset(updatedCloset);
+          renderCloset();
+        }
+      });
+      closetList.appendChild(div);
+    });
+  }
+  // Recommendations JS
+  const moodSelect = document.getElementById('mood-select');
+  const tasteSelect = document.getElementById('taste-select');
+  const recommendBtn = document.getElementById('recommend-btn');
+  const recommendationsList = document.getElementById('recommendations-list');
+  const recommendationOutfitsPreset = [
+    {
+      id: 'rec_outfit_1',
+      name: 'Casual Classic',
+      mood: 'casual',
+      taste: 'classic',
+      items: [
+        {type: 'top', image: 'https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?auto=format&fit=crop&w=400&q=80'},
+        {type: 'bottom', image: 'https://images.unsplash.com/photo-1521334884684-d80222895322?auto=format&fit=crop&w=400&q=80'},
+        {type: 'shoes', image: 'https://images.unsplash.com/photo-1519744792095-2f2205e87b6f?auto=format&fit=crop&w=400&q=80'}
+      ]
+    },
+    {
+      id: 'rec_outfit_2',
+      name: 'Modern Sporty',
+      mood: 'sporty',
+      taste: 'modern',
+      items: [
+        {type: 'top', image: 'https://images.unsplash.com/photo-1503342452485-86a7e0e1949f?auto=format&fit=crop&w=400&q=80'},
+        {type: 'bottom', image: 'https://images.unsplash.com/photo-1542068829-1115f7259450?auto=format&fit=crop&w=400&q=80'},
+        {type: 'shoes', image: 'https://images.unsplash.com/photo-1495121605193-b116b5b09a59?auto=format&fit=crop&w=400&q=80'}
+      ]
+    },
+    {
+      id: 'rec_outfit_3',
+      name: 'Party Bohemian',
+      mood: 'party',
+      taste: 'bohemian',
+      items: [
+        {type: 'dress', image: 'https://images.unsplash.com/photo-1542068829-1115f7259450?auto=format&fit=crop&w=400&q=80'},
+        {type: 'accessory', image: 'https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?auto=format&fit=crop&w=140&q=80'}
+      ]
+    },
+    {
+      id: 'rec_outfit_4',
+      name: 'Minimalist Formal',
+      mood: 'formal',
+      taste: 'minimalist',
+      items: [
+        {type: 'top', image: 'https://images.unsplash.com/photo-1521334884684-d80222895322?auto=format&fit=crop&w=400&q=80'},
+        {type: 'bottom', image: 'https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?auto=format&fit=crop&w=400&q=80'},
+        {type: 'shoes', image: 'https://images.unsplash.com/photo-1542068829-1115f7259450?auto=format&fit=crop&w=400&q=80'}
+      ]
+    }
+  ];
+  function clearRecommendations() {
+    recommendationsList.innerHTML = '';
+  }
+  function renderRecommendations(mood, taste) {
+    clearRecommendations();
+    if (!mood || !taste) {
+      const p = document.createElement('p');
+      p.className = 'no-recommendations';
+      p.textContent = 'Please select both mood and taste to see recommendations.';
+      recommendationsList.appendChild(p);
+      return;
+    }
+    const filtered = recommendationOutfitsPreset.filter(o => o.mood === mood && o.taste === taste);
+    if (filtered.length === 0) {
+      const p = document.createElement('p');
+      p.className = 'no-recommendations';
+      p.textContent = 'No recommendations found for the selected mood and taste.';
+      recommendationsList.appendChild(p);
+      return;
+    }
+    filtered.forEach(o => {
+      const div = document.createElement('div');
+      div.className = 'rec-item';
+      div.setAttribute('tabindex', '0');
+      div.setAttribute('aria-label', `Recommendation outfit: ${o.name}`);
+      const imagesHtml = o.items.map(i => `<img src="${i.image}" alt="${i.type}" style="height:80px; object-fit:cover; border-radius:8px; margin-right:6px;" loading="lazy"/>`).join('');
+      div.innerHTML = `
+        <div class="rec-info">
+          <div style="font-weight:600; color:#6a46f1; font-size:1rem;">${o.name}</div>
+          <div style="display:flex; width: 100%;">${imagesHtml}</div>
+          <button class="rec-save-btn" aria-label="Save recommendation ${o.name} to outfits">Save Outfit</button>
+        </div>
+      `;
+      const btn = div.querySelector('.rec-save-btn');
+      btn.addEventListener('click', () => saveRecommendedOutfit(o));
+      recommendationsList.appendChild(div);
+    });
+  }
+  function saveRecommendedOutfit(outfit) {
+    const outfits = loadOutfits();
+    if (outfits.find(o => o.id === outfit.id)) {
+      alert('This recommended outfit is already saved in your collection!');
+      return;
+    }
+    outfits.push({
+      id: outfit.id,
+      recommended: true,
+      name: outfit.name,
+      items: outfit.items
+    });
+    saveOutfits(outfits);
+    alert(`"${outfit.name}" has been saved to your outfits collection!`);
+  }
+  function loadOutfits() {
+    try {
+      const data = localStorage.getItem('whering_style_outfits');
+      return data ? JSON.parse(data) : [];
+    } catch {
+      return [];
+    }
+  }
+  function saveOutfits(outfits) {
+    localStorage.setItem('whering_style_outfits', JSON.stringify(outfits));
+  }
+  recommendBtn.addEventListener('click', () => {
+    const mood = moodSelect.value;
+    const taste = tasteSelect.value;
+    renderRecommendations(mood, taste);
+  });
+  window.clearRecommendations = clearRecommendations;
+</script>
+</body>
+</html>

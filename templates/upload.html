@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Upload Outfit Item</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      background: #fafafa;
+      color: #121212;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    h2 {
+      font-size: small;
+    }
+
+    #upload-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 59px;
+    }
+
+    #upload-label {
+      cursor: pointer;
+      border: 2px dashed #bbb;
+      border-radius: 10px;
+      width: 160px;
+      height: 160px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 48px;
+      color: #bbb;
+      user-select: none;
+      transition: border-color 0.3s, color 0.3s;
+    }
+
+    #upload-label:hover {
+      border-color: #6a46f1;
+      color: #6a46f1;
+    }
+
+    #upload-input {
+      display: none;
+    }
+
+    #preview {
+      max-width: 160px;
+      max-height: 160px;
+      border-radius: 12px;
+      object-fit: cover;
+      box-shadow: 0 2px 8px rgb(106 70 241 / 0.35);
+      display: none;
+    }
+
+    #item-type-select {
+      width: 160px;
+      font-size: 1rem;
+      padding: 0.5rem;
+      border: 1.5px solid #ddd;
+      border-radius: 6px;
+      outline-offset: 2px;
+      outline-color: transparent;
+      transition: outline-color 0.3s;
+    }
+
+    #item-type-select:focus {
+      outline-color: #6a46f1;
+    }
+
+    #save-item-btn,
+    #remove-bg-btn {
+      background: #6a46f1;
+      color: white;
+      font-weight: 600;
+      border: none;
+      border-radius: 28px;
+      padding: 0.6rem 1.5rem;
+      box-shadow: 0 4px 12px rgb(106 70 241 / 0.5);
+      cursor: pointer;
+      transition: background-color 0.3s, box-shadow 0.3s;
+      user-select: none;
+      margin: 5px 0;
+      width: 160px;
+    }
+
+    #save-item-btn:hover:not(:disabled),
+    #remove-bg-btn:hover:not(:disabled) {
+      background: #7f59f4;
+      box-shadow: 0 6px 16px rgb(127 89 244 / 0.6);
+    }
+
+    #save-item-btn:disabled,
+    #remove-bg-btn:disabled {
+      background: #a998f7;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    #loading-text {
+      color: #6a46f1;
+      font-weight: bold;
+      display: none;
+    }
+
+    #status-msg {
+      margin-top: 10px;
+      font-size: 0.9rem;
+      color: #2c2c2c;
+    }
+  </style>
+</head>
+<body>
+  <section id="upload-section" aria-label="Upload closet item">
+    <h2>Add New Closet Item</h2>
+    <label id="upload-label" for="upload-input" tabindex="0" aria-describedby="uploadDesc">＋</label>
+    <input type="file" id="upload-input" accept="image/*" aria-required="true" aria-label="Upload outfit item image" />
+    <img id="preview" alt="Preview of uploaded outfit item" aria-live="polite" />
+    <select id="item-type-select" aria-label="Select type of clothing" aria-required="true">
+      <option value="" disabled selected>Select item type</option>
+      <option value="top">Top</option>
+      <option value="bottom">Bottom</option>
+      <option value="skirt">Skirt</option>
+      <option value="dress">Dress</option>
+      <option value="shoes">Shoes</option>
+      <option value="accessory">Accessory</option>
+      <option value="outerwear">Outerwear</option>
+    </select>
+    <button id="remove-bg-btn" disabled>Remove Background</button>
+    <button id="save-item-btn" disabled>Save to Closet</button>
+    <div id="loading-text">Removing background...</div>
+    <div id="status-msg" role="status" aria-live="polite"></div>
+  </section>
+
+  <script>
+    (() => {
+      const uploadInput = document.getElementById('upload-input');
+      const preview = document.getElementById('preview');
+      const itemTypeSelect = document.getElementById('item-type-select');
+      const saveItemBtn = document.getElementById('save-item-btn');
+      const removeBgBtn = document.getElementById('remove-bg-btn');
+      const loadingText = document.getElementById('loading-text');
+      const statusMsg = document.getElementById('status-msg');
+
+      let currentUploadDataUrl = null;
+
+      function validateUploadForm() {
+        const canSave = !!currentUploadDataUrl && !!itemTypeSelect.value;
+        saveItemBtn.disabled = !canSave;
+        removeBgBtn.disabled = !currentUploadDataUrl;
+      }
+
+      function resetUploadState() {
+        currentUploadDataUrl = null;
+        preview.src = '';
+        preview.style.display = 'none';
+        uploadInput.value = '';
+        saveItemBtn.disabled = true;
+        removeBgBtn.disabled = true;
+        itemTypeSelect.value = '';
+        statusMsg.textContent = '';
+      }
+
+      uploadInput.addEventListener('change', e => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        if (!file.type.startsWith('image/')) {
+          alert('Please upload a valid image file.');
+          resetUploadState();
+          return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = () => {
+          currentUploadDataUrl = reader.result;
+          preview.src = currentUploadDataUrl;
+          preview.style.display = 'block';
+          validateUploadForm();
+        };
+        reader.readAsDataURL(file);
+      });
+
+      itemTypeSelect.addEventListener('change', validateUploadForm);
+
+      saveItemBtn.addEventListener('click', () => {
+        if (!currentUploadDataUrl || !itemTypeSelect.value) return;
+        const closet = loadCloset();
+        const newItem = {
+          id: 'item_' + Date.now(),
+          image: currentUploadDataUrl,
+          type: itemTypeSelect.value
+        };
+        closet.push(newItem);
+        saveCloset(closet);
+        statusMsg.textContent = 'Item saved to your closet!';
+        resetUploadState();
+      });
+
+      async function removeBackground() {
+        if (!currentUploadDataUrl) {
+          alert('Please upload an image first.');
+          return;
+        }
+
+        try {
+          removeBgBtn.disabled = true;
+          saveItemBtn.disabled = true;
+          loadingText.style.display = 'block';
+
+          const blob = dataURLtoBlob(currentUploadDataUrl);
+          const formData = new FormData();
+          formData.append('image_file', blob, 'upload.png');
+          formData.append('size', 'auto');
+
+          const response = await fetch('/api/remove-bg', {
+            method: 'POST',
+            body: formData
+          });
+
+          if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.errors ? error.errors[0].title : response.statusText);
+          }
+
+          const resultBlob = await response.blob();
+          const processedDataUrl = await blobToDataURL(resultBlob);
+
+          currentUploadDataUrl = processedDataUrl;
+          preview.src = processedDataUrl;
+          preview.style.display = 'block';
+          validateUploadForm();
+        } catch (err) {
+          alert('Error removing background: ' + err.message);
+        } finally {
+          removeBgBtn.disabled = false;
+          loadingText.style.display = 'none';
+          validateUploadForm();
+        }
+      }
+
+      function dataURLtoBlob(dataurl) {
+        const arr = dataurl.split(','), mime = arr[0].match(/:(.*?);/)[1],
+          bstr = atob(arr[1]), n = bstr.length, u8arr = new Uint8Array(n);
+        for (let i = 0; i < n; i++) u8arr[i] = bstr.charCodeAt(i);
+        return new Blob([u8arr], { type: mime });
+      }
+
+      function blobToDataURL(blob) {
+        return new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onloadend = () => resolve(reader.result);
+          reader.onerror = reject;
+          reader.readAsDataURL(blob);
+        });
+      }
+
+      removeBgBtn.addEventListener('click', removeBackground);
+
+      function loadCloset() {
+        try {
+          const data = localStorage.getItem('whering_style_closet');
+          return data ? JSON.parse(data) : [];
+        } catch {
+          return [];
+        }
+      }
+
+      function saveCloset(items) {
+        localStorage.setItem('whering_style_closet', JSON.stringify(items));
+      }
+    })();
+  </script>
+</body>
+</html>
