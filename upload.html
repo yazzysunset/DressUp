@@ -29,11 +29,64 @@
       display: flex;
       justify-content: center;
       align-items: center;
+      position: relative;
     }
     .logo {
       height: 40px;
       object-fit: contain;
     }
+    .profile-section {
+      position: absolute;
+      right: -320px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: #f6f4fd;
+      border-radius: 30px;
+      padding: 10px 22px 10px 15px;
+      box-shadow: 0 6px 18px 0 rgba(106,70,241,0.13), 0 2px 10px rgba(106,70,241,0.11);
+      font-size: 1.09rem;
+      font-weight: 600;
+      color: #6a46f1;
+      margin: 0;
+      z-index: 5;
+    }
+    .profile-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: #d7ccfa;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      color: #6a46f1;
+      font-size: 1.1rem;
+      box-shadow: 0 1px 4px #6a46f133;
+      object-fit: cover;
+    }
+    /* Make logout button look like screenshot */
+    #logout-btn {
+      margin-left: 12px;
+      background: #e03131;
+      color: white;
+      border: none;
+      border-radius: 16px;
+      padding: 7px 18px;
+      font-size: 1.08rem;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 2px 8px #e0313122;
+      transition: background 0.2s, box-shadow 0.2s;
+      outline: none;
+    }
+    #logout-btn:hover, #logout-btn:focus {
+      background: #b71c1c;
+      box-shadow: 0 4px 12px #e0313160;
+    }
+
     nav {
       position: fixed;
       bottom: 0;
@@ -389,6 +442,8 @@
       #closet-list { grid-template-columns: repeat(2, 1fr); }
       main { padding: 0.3rem; }
       .logo { height: 32px; }
+      .profile-section { font-size: 0.9rem; padding: 7px 10px 7px 8px;}
+      .profile-avatar { width: 28px; height: 28px; font-size: 1rem;}
     }
   </style>
 </head>
@@ -396,6 +451,11 @@
 <header>
   <div class="header-container">
     <img src="static/logo.png" class="logo" alt="DressUp logo" />
+    <div id="profile-section" class="profile-section" style="display: none;">
+      <span class="profile-avatar" id="profile-avatar"></span>
+      <span id="profile-username"></span>
+      <button id="logout-btn" type="button">Logout</button>
+    </div>
   </div>
 </header>
 <main>
@@ -468,6 +528,71 @@
   <button id="nav-recommend" class="active">Recommend</button>
 </nav>
 <script>
+  // --- Profile Section Logic ---
+  function getLoggedInUser() {
+    let user = sessionStorage.getItem('dressup_user');
+    if (user) {
+      try { return JSON.parse(user); } catch { return null; }
+    }
+    return null;
+  }
+  function setLoggedInUser(user) {
+    sessionStorage.setItem('dressup_user', JSON.stringify(user));
+  }
+  function clearLoggedInUser() {
+    sessionStorage.removeItem('dressup_user');
+  }
+
+  function renderProfileSection() {
+    const profileSection = document.getElementById('profile-section');
+    const profileAvatar = document.getElementById('profile-avatar');
+    const profileUsername = document.getElementById('profile-username');
+    const user = getLoggedInUser();
+
+    if (!user) {
+      profileSection.style.display = 'none';
+      // Redirect to login page if not logged in
+      window.location.href = "index.html";
+      return;
+    }
+    // Show profile section
+    profileSection.style.display = 'flex';
+    if (user.avatar && user.avatar.length > 0) {
+      profileAvatar.innerHTML = '';
+      profileAvatar.style.background = 'none';
+      profileAvatar.style.backgroundColor = '#fff';
+      profileAvatar.style.overflow = 'hidden';
+      profileAvatar.style.padding = '0';
+      profileAvatar.style.display = 'flex';
+      profileAvatar.style.alignItems = 'center';
+      profileAvatar.style.justifyContent = 'center';
+      const img = document.createElement('img');
+      img.src = user.avatar;
+      img.alt = user.username + ' avatar';
+      img.style.width = '100%';
+      img.style.height = '100%';
+      img.style.borderRadius = '50%';
+      profileAvatar.appendChild(img);
+    } else {
+      profileAvatar.textContent = user.username ? user.username[0].toUpperCase() : '?';
+    }
+    profileUsername.textContent = user.username || 'User';
+  }
+
+  document.getElementById('logout-btn').addEventListener('click', function() {
+    clearLoggedInUser();
+    // Redirect to login page on logout
+    window.location.href = "index.html";
+  });
+
+  window.addEventListener('DOMContentLoaded', function() {
+    renderProfileSection();
+    showSection(recommendSection);
+    initWeather();
+  });
+
+  // --- End Profile Section Logic ---
+
   // Navigation logic
   const navUpload = document.getElementById('nav-upload');
   const navCloset = document.getElementById('nav-closet');
@@ -567,10 +692,7 @@
     );
   }
   // Only fetch weather when upload section is rendered
-  window.addEventListener('DOMContentLoaded', () => {
-    showSection(recommendSection);
-    initWeather();
-  });
+  // (DOMContentLoaded already handled above for profile, weather, and initial section)
   // Upload JS
   const uploadInput = document.getElementById('upload-input');
   const preview = document.getElementById('preview');

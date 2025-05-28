@@ -6,27 +6,14 @@
   <title>Login</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap');
-
-    * {
-      box-sizing: border-box;
-    }
-
-    html, body {
-      height: 100%;
-      margin: 0;
-      padding: 0;
-    }
-
+    * { box-sizing: border-box; }
+    html, body { height: 100%; margin: 0; padding: 0; }
     body {
       font-family: 'Poppins', sans-serif;
       background: linear-gradient(135deg, #a0c4ff 0%, #caf0f8 100%);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      color: #333;
-      padding: 1rem;
+      display: flex; justify-content: center; align-items: center;
+      color: #333; padding: 1rem;
     }
-
     .login-container {
       background: #ffffffdd;
       backdrop-filter: blur(10px);
@@ -41,14 +28,12 @@
       gap: 3rem;
       margin: auto;
     }
-
     .form-column {
       flex: 1;
       display: flex;
       flex-direction: column;
       align-items: center;
     }
-
     .logo {
       font-weight: 700;
       font-size: 2.25rem;
@@ -56,7 +41,6 @@
       margin-bottom: 2rem;
       user-select: none;
     }
-
     form {
       width: 100%;
       max-width: 350px;
@@ -64,35 +48,67 @@
       flex-direction: column;
       align-items: center;
     }
-
     .form-group {
       width: 100%;
       margin-bottom: 1.25rem;
+      position: relative;
     }
-
     label {
       display: block;
       font-weight: 500;
       margin-bottom: 0.4rem;
     }
-
-    input[type="text"],
-    input[type="password"] {
+    input[type="text"], input[type="password"] {
       width: 100%;
       padding: 0.75rem 1rem;
       border-radius: 8px;
       border: 1.8px solid #ccc;
       font-size: 1rem;
       transition: border-color 0.3s ease;
+      box-sizing: border-box;
     }
-
-    input[type="text"]:focus,
-    input[type="password"]:focus {
+    input[type="text"]:focus, input[type="password"]:focus {
       outline: none;
       border-color: #0077b6;
       box-shadow: 0 0 8px rgba(0, 119, 182, 0.3);
     }
-
+    .password-field {
+      position: relative;
+      width: 100%;
+      display: flex;
+      align-items: center;
+    }
+    .password-field input[type="password"],
+    .password-field input[type="text"] {
+      width: 100%;
+      padding-right: 44px;
+      box-sizing: border-box;
+    }
+    .see-btn {
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      padding: 0;
+      margin: 0;
+      outline: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      opacity: 0.7;
+      transition: opacity 0.2s;
+      height: 32px;
+      width: 32px;
+    }
+    .see-btn:hover, .see-btn:focus {
+      opacity: 1;
+    }
+    .see-btn svg {
+      display: block;
+      pointer-events: none;
+    }
     button {
       background-color: #0077b6;
       color: white;
@@ -122,24 +138,19 @@
       text-decoration: underline;
       transition: color 0.2s;
     }
-    .toggle-link:hover {
-      color: #023e8a;
-    }
-
+    .toggle-link:hover { color: #023e8a; }
     .qr-column {
       flex-basis: 180px;
       flex-shrink: 0;
       text-align: center;
       user-select: none;
     }
-
     .qr-column p {
       font-weight: 600;
       margin-bottom: 0.75rem;
       color: #023e8a;
       font-size: 1.1rem;
     }
-
     .qr-code {
       width: 185px;
       height: 185px;
@@ -148,7 +159,17 @@
       box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
       user-select: none;
     }
-
+    .info-message, .error-message, .success-message {
+      width: 100%;
+      text-align: center;
+      margin: 0.8rem 0 1rem 0;
+      font-size: 1rem;
+      padding: 0.7rem;
+      border-radius: 9px;
+    }
+    .info-message { background: #f1f8ff; color: #0077b6; }
+    .success-message { background: #d2fcd2; color: #176617; }
+    .error-message { background: #ffe2e2; color: #b00020; }
     @media (max-width: 900px) {
       .login-container {
         max-width: 95vw;
@@ -156,12 +177,8 @@
         padding-right: 1.2rem;
       }
     }
-
     @media (max-width: 720px) {
-      body {
-        padding: 0;
-      }
-
+      body { padding: 0; }
       .login-container {
         flex-direction: column;
         max-width: 360px;
@@ -169,27 +186,17 @@
         padding: 2rem 1rem;
         gap: 2rem;
       }
-
       .qr-column {
         order: -1;
         margin-bottom: 1rem;
         width: 100%;
         text-align: center;
       }
-
-      form {
-        width: 100%;
-      }
-
-      button {
-        width: 100%;
-      }
+      form { width: 100%; }
+      button { width: 100%; }
     }
-
     @media (max-width: 450px) {
-      .body{
-        height: 50%;
-      }
+      .body{ height: 50%; }
       .login-container {
         flex-direction: column;
         max-width: 360px;
@@ -197,19 +204,9 @@
         gap: 2rem;
         padding: 0;
       }
-
-      .qr-code {
-        width: 100px;
-        height: 100px;
-      }
-
-      .logo {
-        font-size: 1.4rem;
-      }
-
-      button {
-        font-size: 1rem;
-      }
+      .qr-code { width: 100px; height: 100px; }
+      .logo { font-size: 1.4rem; }
+      button { font-size: 1rem; }
     }
   </style>
 </head>
@@ -217,22 +214,31 @@
   <main class="login-container" role="main">
     <section class="form-column">
       <div class="logo">DressUp</div>
-
+      <div id="messageArea"></div>
       <!-- Login Form -->
       <form id="loginForm" aria-describedby="loginInstructions" novalidate>
         <div id="loginInstructions" style="position:absolute;left:-9999px;">
           Please enter your username and password to log in.
         </div>
         <div class="form-group">
-          <label for="username">Username or Email</label>
+          <label for="username">Email</label>
           <input type="text" id="username" name="username" placeholder="yawqna@example.com" required autocomplete="username" />
         </div>
         <div class="form-group">
           <label for="password">Password</label>
-          <input type="password" id="password" name="password" placeholder="Your password" required autocomplete="current-password" />
+          <div class="password-field">
+            <input type="password" id="password" name="password" placeholder="Your password" required autocomplete="current-password" />
+            <button type="button" class="see-btn" id="see-login-password" tabindex="-1" aria-label="Show/Hide password">
+              <svg id="login-eye" viewBox="0 0 24 24" width="22" height="22" fill="none">
+                <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z" stroke="#222" stroke-width="2" fill="none"/>
+                <circle cx="12" cy="12" r="3" fill="#222"/>
+              </svg>
+            </button>
+          </div>
         </div>
         <button type="submit">Log In</button>
         <button type="button" class="toggle-link" id="showSignupBtn">Don't have an account? Sign Up</button>
+        <button type="button" class="toggle-link" id="forgotPasswordBtn" style="margin-top:0.4rem;">Forgot password?</button>
       </form>
       <!-- Sign Up Form (hidden by default) -->
       <form id="signupForm" aria-describedby="signupInstructions" style="display:none" novalidate>
@@ -249,78 +255,249 @@
         </div>
         <div class="form-group">
           <label for="signup-password">Password</label>
-          <input type="password" id="signup-password" name="signup-password" placeholder="Create a password" required autocomplete="new-password" />
+          <div class="password-field">
+            <input type="password" id="signup-password" name="signup-password" placeholder="Create a password" required autocomplete="new-password" />
+            <button type="button" class="see-btn" id="see-signup-password" tabindex="-1" aria-label="Show/Hide password">
+              <svg id="signup-eye" viewBox="0 0 24 24" width="22" height="22" fill="none">
+                <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z" stroke="#222" stroke-width="2" fill="none"/>
+                <circle cx="12" cy="12" r="3" fill="#222"/>
+              </svg>
+            </button>
+          </div>
           <small style="color: #555;">Must be 8+ characters, with uppercase, lowercase, and number.</small>
         </div>
         <button type="submit">Sign Up</button>
         <button type="button" class="toggle-link" id="showLoginBtn">Already have an account? Log In</button>
       </form>
+      <!-- OTP Form (hidden by default, not used for Firebase verification but kept for future) -->
+      <form id="otpForm" style="display:none" novalidate>
+        <div class="form-group">
+          <label for="otp-code">Enter OTP sent to your email</label>
+          <input type="text" id="otp-code" name="otp-code" placeholder="123456" required autocomplete="one-time-code" disabled />
+        </div>
+        <button type="submit" disabled>Verify OTP</button>
+      </form>
     </section>
-
     <section class="qr-column">
       <p>Scan to style!</p>
-      <img src="static/qr.png" alt="QR code for web app" class="qr-code" />
+      <img src="static/qr_code.png" alt="QR code for web app" class="qr-code" />
     </section>
   </main>
 
-  <!-- JavaScript Toggle & Form Handlers -->
- <script>
-  // Toggle between login and signup forms
-  document.getElementById('showSignupBtn').addEventListener('click', function () {
-    document.getElementById('loginForm').style.display = 'none';
-    document.getElementById('signupForm').style.display = '';
-  });
+  <!-- Password Reset Modal -->
+  <div id="resetModal" style="display:none; position:fixed; left:0; top:0; width:100vw; height:100vh; background:rgba(0,0,0,0.18); align-items:center; justify-content:center; z-index:9999;">
+    <div style="background:#fff; padding:2rem 1.5rem; border-radius:12px; max-width:350px; width:95%; margin:auto; box-shadow:0 4px 24px #0002; position:relative;">
+      <button id="closeResetModal" style="position:absolute; top:10px; right:14px; background:none; border:none; font-size:1.3rem; cursor:pointer;">×</button>
+      <h3 style="margin-top:0;">Reset Password</h3>
+      <form id="resetForm">
+        <div class="form-group" style="margin-bottom:0.8rem;">
+          <label for="reset-email">Enter your email address</label>
+          <input type="text" id="reset-email" name="reset-email" placeholder="your@email.com" required autocomplete="email" />
+        </div>
+        <button type="submit" style="margin-top:0.5rem;">Send Reset Email</button>
+      </form>
+      <div id="resetStatus" style="margin-top:0.6rem; font-size:0.98rem;"></div>
+    </div>
+  </div>
 
-  document.getElementById('showLoginBtn').addEventListener('click', function () {
-    document.getElementById('loginForm').style.display = '';
-    document.getElementById('signupForm').style.display = 'none';
-  });
+  <!-- Firebase App & Auth SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script>
+    // Firebase config
+    const firebaseConfig = {
+      apiKey: "AIzaSyBjvOwmtAhYQLpyE945vj9Ja9YlPVDGj5k",
+      authDomain: "dressup-d4051.firebaseapp.com",
+      projectId: "dressup-d4051",
+      storageBucket: "dressup-d4051.firebasestorage.app",
+      messagingSenderId: "1039757900181",
+      appId: "1:1039757900181:web:c61a2e7a145745b54e5e9c",
+      measurementId: "G-V9MS49P699"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+  </script>
+  <script>
+    // Toggle between login and signup forms
+    document.getElementById('showSignupBtn').addEventListener('click', function () {
+      document.getElementById('loginForm').style.display = 'none';
+      document.getElementById('signupForm').style.display = '';
+      document.getElementById('otpForm').style.display = 'none';
+      clearMessage();
+    });
+    document.getElementById('showLoginBtn').addEventListener('click', function () {
+      document.getElementById('loginForm').style.display = '';
+      document.getElementById('signupForm').style.display = 'none';
+      document.getElementById('otpForm').style.display = 'none';
+      clearMessage();
+    });
 
-  // Password validation function
-  function isPasswordValid(password) {
-    const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
-    return regex.test(password);
-  }
-
-  // Login handler
-  document.getElementById('loginForm').addEventListener('submit', function (e) {
-    e.preventDefault();
-    const username = this.username.value.trim();
-    const password = this.password.value.trim();
-
-    if (!username || !password) {
-      alert('Please enter both username/email and password.');
-      return;
+    // Password validation function
+    function isPasswordValid(password) {
+      const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
+      return regex.test(password);
     }
 
-    if (!isPasswordValid(password)) {
-      alert('Password must be at least 8 characters long and include a number, an uppercase letter, and a lowercase letter.');
-      return;
+    // Helper for showing messages
+    function showMessage(msg, type = 'info') {
+      const area = document.getElementById('messageArea');
+      area.innerHTML = `<div class="${type}-message">${msg}</div>`;
+    }
+    function clearMessage() {
+      document.getElementById('messageArea').innerHTML = '';
     }
 
-    window.location.href = 'upload.html';
-  });
-
-  // Signup handler
-  document.getElementById('signupForm').addEventListener('submit', function (e) {
-    e.preventDefault();
-    const username = this['signup-username'].value.trim();
-    const email = this['signup-email'].value.trim();
-    const password = this['signup-password'].value.trim();
-
-    if (!username || !email || !password) {
-      alert('Please complete all fields.');
-      return;
+    // Show/Hide password logic for login and signup forms (with eye icon and slash)
+    function togglePassword(inputId, btnId, eyeId) {
+      const input = document.getElementById(inputId);
+      const btn = document.getElementById(btnId);
+      const eye = document.getElementById(eyeId);
+      let isVisible = false;
+      btn.addEventListener('click', function (e) {
+        e.preventDefault();
+        isVisible = !isVisible;
+        input.type = isVisible ? 'text' : 'password';
+        // Update eye icon: filled (with slash for visible, plain for hidden)
+        if (isVisible) {
+          eye.innerHTML = `
+            <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z" stroke="#222" stroke-width="2" fill="none"/>
+            <circle cx="12" cy="12" r="3" fill="#222"/>
+            <line x1="4" y1="20" x2="20" y2="4" stroke="#b00020" stroke-width="2"/>
+          `;
+        } else {
+          eye.innerHTML = `
+            <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z" stroke="#222" stroke-width="2" fill="none"/>
+            <circle cx="12" cy="12" r="3" fill="#222"/>
+          `;
+        }
+      });
     }
+    togglePassword('password', 'see-login-password', 'login-eye');
+    togglePassword('signup-password', 'see-signup-password', 'signup-eye');
 
-    if (!isPasswordValid(password)) {
-      alert('Password must be at least 8 characters long and include a number, an uppercase letter, and a lowercase letter.');
-      return;
-    }
+    // Login handler with Firebase Auth and email verification
+    document.getElementById('loginForm').addEventListener('submit', function (e) {
+      e.preventDefault();
+      clearMessage();
+      const email = this.username.value.trim();
+      const password = this.password.value.trim();
+      if (!email || !password) {
+        showMessage('Please enter both username/email and password.', 'error');
+        return;
+      }
+      if (!isPasswordValid(password)) {
+        showMessage('Password must be at least 8 characters long and include a number, an uppercase letter, and a lowercase letter.', 'error');
+        return;
+      }
+      auth.signInWithEmailAndPassword(email, password)
+        .then((userCredential) => {
+          if (!userCredential.user.emailVerified) {
+            showMessage(
+              `You need email verification to log in. Please check your inbox for a verification link.<br>
+               <button id="resendVerification" style="margin-top:7px;">Resend Verification Email</button>`, 'error'
+            );
+            auth.signOut();
+            // Allow user to resend verification
+            setTimeout(() => {
+              const btn = document.getElementById('resendVerification');
+              if (btn) {
+                btn.onclick = function() {
+                  userCredential.user.sendEmailVerification().then(() => {
+                    showMessage('Verification email resent! Please check your inbox (and spam).', 'success');
+                  }).catch(err => {
+                    showMessage('Failed to resend verification email: ' + err.message, 'error');
+                  });
+                };
+              }
+            }, 200);
+            return;
+          }
+          // Set user info in sessionStorage for upload.html/profile
+          let user = userCredential.user;
+          let profile = {
+            username: user.displayName || user.email.split('@')[0],
+            avatar: user.photoURL || ""
+          };
+          sessionStorage.setItem('dressup_user', JSON.stringify(profile));
+          // Redirect to main page
+          window.location.href = 'upload.html';
+        })
+        .catch((error) => {
+          showMessage(error.message, 'error');
+        });
+    });
 
-    alert('Account created! Logging you in...');
-    window.location.href = 'upload.html';
-  });
-</script>
+    // Signup handler with Firebase Auth and email verification
+    document.getElementById('signupForm').addEventListener('submit', function (e) {
+      e.preventDefault();
+      clearMessage();
+      const username = this['signup-username'].value.trim();
+      const email = this['signup-email'].value.trim();
+      const password = this['signup-password'].value.trim();
+      if (!username || !email || !password) {
+        showMessage('Please complete all fields.', 'error');
+        return;
+      }
+      if (!isPasswordValid(password)) {
+        showMessage('Password must be at least 8 characters long and include a number, an uppercase letter, and a lowercase letter.', 'error');
+        return;
+      }
+      auth.createUserWithEmailAndPassword(email, password)
+        .then((userCredential) => {
+          return userCredential.user.updateProfile({ displayName: username })
+            .then(() => userCredential.user.sendEmailVerification())
+            .then(() => {
+              showMessage('Account created! Please check your email for a verification link before logging in.', 'success');
+              document.getElementById('signupForm').style.display = 'none';
+              document.getElementById('loginForm').style.display = '';
+            });
+        })
+        .catch((error) => {
+          showMessage(error.message, 'error');
+        });
+    });
+
+    // OTP verification handler (disabled for Firebase, but kept for future)
+    document.getElementById('otpForm').addEventListener('submit', function (e) {
+      e.preventDefault();
+      showMessage('OTP-based login is not supported for now. Please verify your email using the link sent to your email.', 'info');
+    });
+
+    // Forgot password modal logic
+    document.getElementById('forgotPasswordBtn').addEventListener('click', function() {
+      document.getElementById('resetModal').style.display = 'flex';
+      document.getElementById('resetStatus').textContent = '';
+      document.getElementById('reset-email').value = '';
+    });
+    document.getElementById('closeResetModal').addEventListener('click', function() {
+      document.getElementById('resetModal').style.display = 'none';
+    });
+    document.getElementById('resetModal').addEventListener('click', function(e) {
+      if (e.target === this) this.style.display = 'none';
+    });
+
+    // Password reset logic
+    document.getElementById('resetForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      var email = document.getElementById('reset-email').value.trim();
+      var resetStatus = document.getElementById('resetStatus');
+      if (!email) {
+        resetStatus.textContent = 'Please enter your email address.';
+        resetStatus.style.color = '#b00020';
+        return;
+      }
+      resetStatus.textContent = 'Sending reset email...';
+      resetStatus.style.color = '#0077b6';
+      auth.sendPasswordResetEmail(email)
+        .then(function() {
+          resetStatus.textContent = 'Password reset email sent! Please check your inbox (and spam).';
+          resetStatus.style.color = '#176617';
+        })
+        .catch(function(error) {
+          resetStatus.textContent = error.message;
+          resetStatus.style.color = '#b00020';
+        });
+    });
+  </script>
 </body>
 </html>
